@@ -1,0 +1,442 @@
+<html>
+<head>
+<script type="text/javascript" src="jquery-1.10.1.min.js"></script>
+<script type="text/javascript" src="jquery-ui1.8.16.min.js"></script>
+<script type="text/javascript" src="jquery-ui-1.7.1.custom.min.js"></script>
+<script type="text/javascript" src="angular.min.js"></script>
+<link href="bootstrap.min.css" rel="stylesheet" type="text/css"/>
+<link href="jquery-ui-1.10.2.custom.css" rel="stylesheet" type="text/css"/>
+<link href="font-awesome.min.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="bootstrap.min.js"></script>
+<script type="text/javascript" src="jquery-ui-1.10.2.custom.min.js"></script>
+<script type="text/javascript" src="plugins.js"></script>
+<link href="style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<script>
+
+    /*---------AngularJs----------*/
+
+    var rosterApp = angular.module('roster', []);
+
+    rosterApp.controller('main', ['$scope', '$compile', function($scope, $compile)
+        {
+            /*-------------Initialize ------------*/
+
+            $scope.monthDaySelectOption = 'all';
+
+            var weekDayNames = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+            $scope.weekDays = {};
+
+            angular.forEach(weekDayNames, function(value, key)
+            {
+                $scope.weekDays[value] = false;
+            });
+
+            $scope.monthDays = {};
+
+            for (var i = 0; i < 31; i ++)
+            {
+                $scope.monthDays['2014-01-' + (i + 1)] = {day: weekDayNames[(i) % 7]};
+            }
+
+            $scope.employees = [];
+
+            for (var i = 1; i < 8; i ++)
+            {
+                var employee = {id: i, name: 'Employee ' + i, dayRosters: {}};
+
+                angular.forEach($scope.monthDays, function(value, key)
+                {
+                    employee.dayRosters[key] = 1;
+                });
+
+                $scope.employees.push(employee);
+            }
+
+            $scope.rosters =
+                    [
+                        {"value": 1, "text": "Roster 1"},
+                        {"value": 2, "text": "Roster 2"},
+                        {"value": 3, "text": "Roster 3"},
+                        {"value": 4, "text": "Roster 4"},
+                        {"value": 5, "text": "Roster 5"},
+                    ];
+
+            /*---------- App Control models ----------*/
+
+            //Also can treat as employee control models
+
+            $scope.rosterRowModels = {};
+
+            angular.forEach($scope.employees, function(employee, key)
+            {
+                $scope.rosterRowModels[employee.id] =
+                        {
+                            isSelected: true,
+                            selectedRoster: null,
+                            selectOption: 'all',
+                        };
+            });
+
+
+            //Month days control models.
+
+            $scope.rosterMonthdayModels = {};
+
+            angular.forEach($scope.monthDays, function(monthDay, key)
+            {
+                $scope.rosterMonthdayModels[key] =
+                        {
+                            selectedRoster: null
+                        };
+            });
+
+
+            /*------------ Events -------------*/
+
+            $scope.changeEmployeeMonthRosters = function(employee, model)
+            {
+                angular.forEach(employee.dayRosters, function(dayRoster, key)
+                {
+                    if ($scope.rosterRowModels[employee.id].selectOption == 'week')
+                    {
+                        if ($scope.weekDays[$scope.monthDays[key].day])
+                        {
+                            employee.dayRosters[key] = model;
+                        }
+                    }
+                    else
+                    {
+                        employee.dayRosters[key] = model;
+                    }
+
+                });
+
+                angular.forEach($scope.weekDays, function(weekDay, key)
+                {
+                    $scope.weekDays[key] = false;
+                });
+            }
+
+            $scope.changeMonthdayRosters = function()
+            {
+                angular.forEach($scope.rosterMonthdayModels, function(model, key)
+                {
+                    if ($scope.monthDaySelectOption == 'week')
+                    {
+                        if ($scope.weekDays[$scope.monthDays[key].day])
+                        {
+                            $scope.rosterMonthdayModels[key].selectedRoster = $scope.monthDaySelectedRoster;
+                        }
+                    }
+                    else
+                    {
+                        $scope.rosterMonthdayModels[key].selectedRoster = $scope.monthDaySelectedRoster;
+                    }
+
+                });
+
+                angular.forEach($scope.weekDays, function(weekDay, key)
+                {
+                    $scope.weekDays[key] = false;
+                });
+            }
+
+            $scope.changeEmployeesRosters = function(day, roster)
+            {
+                angular.forEach($scope.employees, function(employee, key)
+                {
+                    if ($scope.rosterRowModels[employee.id].isSelected)
+                    {
+                        $scope.employees[key].dayRosters[day] = roster;
+                    }
+                });
+            }
+
+            $scope.selectWeekDays = function(employeeId)
+            {
+                var selector = $('<div>').css('margin-top', '6px');
+
+                var container = $('<span>');
+
+                angular.forEach($scope.weekDays, function(key, val)
+                {
+                    container.append(
+                            $('<input>')
+                            .attr('type', 'checkbox')
+                            .attr('ng-model', "weekDays['" + val + "']")
+                            .attr('id', val)
+                            );
+                    container.append(
+                            $('<label>')
+                            .attr('for', val)
+                            .html(val)
+                            );
+                });
+
+                container.buttonset();
+
+                selector.append(container);
+
+                selector.dialog
+                        ({
+                            autoOpen: false,
+                            width: 342,
+                            buttons: {
+                                "Ok": function() {
+                                    $(this).remove();
+                                },
+                                "Cancel": function() {
+                                    //Pressing "cancel" coused to set selectOption sets to 'all'.
+                                    $(this).remove();
+                                }
+                            }
+                        });
+
+                selector.dialog('open');
+                selector.parent().children('.ui-dialog-titlebar').remove();
+
+                $compile(selector)($scope);
+            }
+
+            $scope.selectMonthWeekDays = function()
+            {
+                var selector = $('<div>')
+
+                var container = $('<span>');
+
+                angular.forEach($scope.weekDays, function(key, val)
+                {
+                    container.append(
+                            $('<input>')
+                            .attr('type', 'checkbox')
+                            .attr('ng-model', "weekDays['" + val + "']")
+                            .attr('id', val)
+                            );
+                    container.append(
+                            $('<label>')
+                            .attr('for', val)
+                            .html(val)
+                            );
+                });
+
+                container.buttonset();
+
+                selector.append(container);
+
+                selector.dialog
+                        ({
+                            autoOpen: false,
+                            width: 342,
+                            title: "",
+                            buttons: {
+                                "Ok": function() {
+                                    $(this).remove();
+                                },
+                                "Cancel": function() {
+                                    $(this).remove();
+                                }
+                            }
+                        });
+
+                selector.dialog('open');
+                selector.parent().children('.ui-dialog-titlebar').remove();
+
+                $compile(selector)($scope);
+            }
+
+            $scope.selectButtonTextIndex = 1;
+
+            $scope.SelectAllEmployees = function($event)
+            {
+                angular.forEach($scope.rosterRowModels, function(employee, key)
+                {
+                    employee.isSelected = $scope.selectButtonTextIndex == 0;
+                });
+
+                $scope.selectButtonTextIndex = ($scope.selectButtonTextIndex + 1) % 2;
+            }
+
+            $scope.UpdateSelectedEmployeesRosters = function()
+            {
+                angular.forEach($scope.employees, function(employee, key1)
+                {
+                    angular.forEach(employee.dayRosters, function(dayRoster, key2)
+                    {
+                        if ($scope.rosterMonthdayModels[key2].selectedRoster != null && $scope.rosterRowModels[employee.id].isSelected)
+                        {
+                            $scope.employees[key1].dayRosters[key2] = $scope.rosterMonthdayModels[key2].selectedRoster;
+                        }
+                    });
+                });
+            }
+
+            $scope.notSorted = function(obj)
+            {
+                return Object.keys(obj)
+            }
+
+        }]);
+
+    /*------------Directives------------*/
+
+    rosterApp.directive('mintRadioSet', function()
+    {
+        return function(scope, element, attrs)
+        {
+            $(function()
+            {
+                $(element).buttonset();
+            });
+        }
+    });
+
+    /*------------Services------------*/
+
+</script>
+<div ng-app="roster" ng-controller="main">
+    <div style="height:5px"></div>
+    <div id="tool_bar" style="height: 40px; background: #ddd; border: 1px solid #ccc;">
+    </div>
+    <div style="height: 400px;" >
+        <div style="background: #eee;">
+            <div style="display: table-cell; text-align: center; vertical-align: middle; width: 220px; background: #699FAF">
+                <div style="display: inline-table;width: 80%">
+                    <div style="display: table-cell;">
+                        <span class="roster_move_up mint_icon_button"></span>
+                    </div>
+                    <div style="display: table-cell;">
+                        <span class="roster_move_down mint_icon_button"></span>
+                    </div>
+                    <div style="display: table-cell;">
+                        <span class="roster_move_back mint_icon_button"></span>
+                    </div>
+                    <div style="display: table-cell;">
+                        <span class="roster_move_forth mint_icon_button"></span>
+                    </div>
+                </div>
+            </div>
+            <div style="display: table-cell;vertical-align: top;">
+                <div style="overflow: hidden; height: 46px; border-bottom: 1px solid #ddd;">
+                    <div class="linked" style="overflow-x: scroll; overflow-y: hidden; width: 770px; height: 65px;">
+                        <div>
+                            <div style="display: table-cell; text-align: center;" ng-repeat="day in notSorted(monthDays)">
+                                <div style="padding: 10px; margin: 2px; width:128px; background: #eee; border: 1px solid #ddd">
+                                    {{day}}<span style="text-transform: capitalize; margin-left: 10px; color: #aaa">{{monthDays[day].day}}<span>
+                                            </div>
+                                            </div>
+                                            </div>
+                                            </div>
+                                            </div>
+                                            </div>
+                                            <div style="display: table-cell;width: 308px;background: #699FAF"></div>
+                                            <div style="display: table-cell;width: 5px;background: #699FAF"></div>
+                                            </div>
+                                            <div style="overflow-y: scroll;height:360px">
+                                                <script>
+                                                    $(function()
+                                                    {
+                                                        $('#row_container').css('display', 'table');
+                                                    });
+                                                </script>
+                                                <div id="row_container" style="display: table;">
+                                                    <div style="display: table-cell; vertical-align: top; width: 228px; border-right: 1px solid #ddd">
+                                                        <div ng-repeat="employee in employees" style='height: 30px;  padding: 2px 10px;'>
+                                                            <div style="display: table; width: 94%; background: #eee; border: 1px solid #ddd; padding: 5px; border-radius: 2px;">
+                                                                <div style="width: 90%; display: table-cell; vertical-align: middle;">
+                                                                    <span>{{employee.name}}</span>
+                                                                </div>
+                                                                <div style="width: 10%; display: table-cell; vertical-align: middle">
+                                                                    <input style="" type="checkbox" ng-model="rosterRowModels[employee.id].isSelected">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div style="display: table-cell; vertical-align: top; background: #f0f0f0">
+                                                        <div id="roster_set_outer" style="overflow-y: hidden;">
+                                                            <div id="roster_set_inner" class="linked" style="overflow-x: auto; width: 770px;">
+                                                                <div style="width: 1000px;background: #f0f0f0">
+                                                                    <div ng-repeat="employee in employees" style="display: table-row">
+                                                                        <div ng-repeat="day in notSorted(monthDays)" style="display: table-cell; padding: 2px; height: 30px; text-align: center;">
+                                                                            <select style="width: 150px" ng-model="employee.dayRosters[day]" ng-options="roster.value as roster.text for roster in rosters">
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <script>
+                                                            $(function()
+                                                            {
+                                                                $('#roster_set_inner').height($('#roster_set_inner').height() + 4);
+                                                                $('#roster_set_outer').height($('#roster_set_inner').height() - 15);
+                                                            });
+                                                        </script>
+                                                    </div>
+                                                    <div style="display: table-cell; vertical-align: top; text-align: center; width: 264px; border-left: 1px solid #ddd">
+                                                        <div style="overflow-y: hidden;">
+                                                            <div ng-repeat="employee in employees" style="display: table-row">
+                                                                <div style="padding: 2px;padding-right: 0">
+                                                                    <span mint-radio-set>
+                                                                        <input ng-model="rosterRowModels[employee.id].selectOption" value="all" type="radio" name="{{employee.id + 'dso'}}" id="{{employee.id + 'dso_all'}}">
+                                                                        <label style="font-size: 10px; padding: 7px 5px" for="{{employee.id + 'dso_all'}}">All</label>
+                                                                        <input ng-model="rosterRowModels[employee.id].selectOption" value="week" type="radio" name="{{employee.id + 'dso'}}" id="{{employee.id + 'dso_day'}}" ng-click="selectWeekDays(employee.id)">
+                                                                        <label style="font-size: 10px; padding: 7px 5px" for="{{employee.id + 'dso_day'}}">Week</label>
+                                                                    </span>
+                                                                    <select style="width: 146px; margin-left: 9px;" ng-model="rosterRowModels[employee.id].selectedRoster" ng-change="changeEmployeeMonthRosters(employee, rosterRowModels[employee.id].selectedRoster)" ng-options="roster.value as roster.text for roster in rosters"></select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style="background: #eee;display: block;">
+                                                <div style="display: table-cell; text-align: center; vertical-align: middle; width: 212px;background: #699FAF">
+                                                    <button style="width:176px;" ng-click="SelectAllEmployees($event)" class="ui-corner-all  ui-button ui-widget ui-state-default ui-button-text-icon-primary">
+                                                        <span style="padding: 3px" class="ui-button-text">{{selectButtonTextIndex==0 && 'Select All' || 'Clear All'}}</span>
+                                                    </button>
+                                                </div>
+                                                <div style="display: table-cell; vertical-align: bottom;  background: #eee; border-top: 1px solid #ccc;">
+                                                    <div class="linked" style="overflow-x: auto; width: 770px">
+                                                        <div style="width: 1000px; height: 52px;">
+                                                            <div style="display: table-cell; padding: 2px; text-align: center;" ng-repeat="day in notSorted(monthDays)">
+                                                                <select style="width: 150px" ng-model="rosterMonthdayModels[day].selectedRoster" ng-change="changeEmployeesRosters(day, rosterMonthdayModels[day].selectedRoster)" ng-options="roster.value as roster.text for roster in rosters"></select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div style="display: table-cell; width: 256px; background: #ddd;  border: 1px solid #ccc; border-right: 0;">
+                                                    <div style="padding: 10px 15px;padding-right: 0">
+                                                        <span mint-radio-set>
+                                                            <input ng-model="monthDaySelectOption" id="mdso_all" value="all" type="radio" name="mdso">
+                                                            <label style="font-size: 10px; padding: 8px 5px" for="mdso_all">All</label>
+                                                            <input ng-model="monthDaySelectOption" id="mdso_week" value="week" type="radio" name="mdso" ng-click="selectMonthWeekDays()">
+                                                            <label style="font-size: 10px; padding: 8px 5px" for="mdso_week">Week</label>
+                                                        </span>
+                                                        <select style="width: 150px" ng-model="monthDaySelectedRoster" ng-change="changeMonthdayRosters()" ng-options="roster.value as roster.text for roster in rosters"></select>
+                                                        <div style="height:5px"></div>
+                                                        <button style="width:218px" ng-click="UpdateSelectedEmployeesRosters()" class="ui-corner-all  ui-button ui-widget ui-state-default ui-button-text-icon-primary">
+                                                            <span style="padding: 4px" class="ui-button-text">Update All</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div style="display: table-cell;width: 5px;background: #ddd; border: 1px solid #ccc; border-left: 0;"></div>
+                                            </div>
+                                            </div>
+                                            <script>
+
+                                                $('.linked').scroll(function() {
+                                                    $('.linked').scrollLeft($(this).scrollLeft());
+                                                })
+
+                                            </script>
+                                            </div>
+                                            </div>
+
+
+</body>
+<html>
+

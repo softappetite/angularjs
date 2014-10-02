@@ -1,0 +1,112 @@
+
+/*------------ Top notification ------------*/
+
+
+/*------------ Error ----------*/
+
+.mint_top_notification_error {
+    color: #404040;
+    background-repeat: repeat-x;
+    background-image: -webkit-linear-gradient(top, #FCD5D5, #FFF);
+    background-image: -moz-linear-gradient(top, #FCD5D5, #FFF);
+    background-image: -o-linear-gradient(top, #FCD5D5, #FFF);
+    background-image: linear-gradient(top, #FCD5D5, #FFF);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    border-color: #CCC;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    border-width: 1px;
+    border-style: solid;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.mint_top_notification_icon_error {
+    
+    width: 30px;
+    height: 30px;
+    background: url("images/error.ico") no-repeat center;
+    background-size: 25px 25px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+
+/*------------ Warning ----------*/
+
+.mint_top_notification_warning {
+    color: #404040;
+    background-repeat: repeat-x;
+    background-image: -webkit-linear-gradient(top, #FFFCB8, #FFF);
+    background-image: -moz-linear-gradient(top, #FFFCB8, #FFF);
+    background-image: -o-linear-gradient(top, #FFFCB8, #FFF);
+    background-image: linear-gradient(top, #FFFCB8, #FFF);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    border-color: #CCC;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    border-width: 1px;
+    border-style: solid;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.mint_top_notification_icon_warning {
+    
+    width: 30px;
+    height: 30px;
+    background: url("images/warning.ico") no-repeat center;
+    background-size: 25px 25px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/*------------ Success ----------*/
+
+.mint_top_notification_success {
+    color: #404040;
+    background-repeat: repeat-x;
+    background-image: -webkit-linear-gradient(top, #D2FFB8, #FFF);
+    background-image: -moz-linear-gradient(top, #D2FFB8, #FFF);
+    background-image: -o-linear-gradient(top, #D2FFB8, #FFF);
+    background-image: linear-gradient(top, #D2FFB8, #FFF);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    border-color: #CCC;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    border-width: 1px;
+    border-style: solid;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.mint_top_notification_icon_success {
+    
+    width: 30px;
+    height: 30px;
+    background: url("images/success.ico") no-repeat center;
+    background-size: 25px 25px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+
+
+.mint_top_notification_close {
+    
+    width: 30px;
+    height: 20px;
+    background: url("images/close.png") no-repeat center;
+    background-size: 18px 18px;
+    display: inline-block;
+    vertical-align: middle;
+}
